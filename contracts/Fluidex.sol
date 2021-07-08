@@ -2,9 +2,9 @@
 
 pragma solidity >=0.6.0 <0.8.0;
 
-import "./PlonkCore.sol";
+import "./verifier.sol";
 
-contract FluidexDemo is PlonkCore {
+contract FluidexDemo is KeyedVerifier {
    enum BlockState {
       Empty,
       Submitted,
@@ -39,7 +39,7 @@ contract FluidexDemo is PlonkCore {
 
       if (_serialized_proof.length != 0) {
          // TODO: hash inputs and then pass into verifier
-         assert(verifySerializedProof(_public_inputs, _serialized_proof));
+         assert(verify_serialized_proof(_public_inputs, _serialized_proof));
          block_states[_block_id] = BlockState.Verified;
       } else {
          // mark a block as Submitted (Committed) directly, because we may
