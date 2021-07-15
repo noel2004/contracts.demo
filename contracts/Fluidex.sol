@@ -2,6 +2,7 @@
 
 pragma solidity >=0.6.0 <0.8.0;
 
+import "hardhat/console.sol"; // for debug
 import "./verifier.sol";
 
 contract FluidexDemo is KeyedVerifier {
