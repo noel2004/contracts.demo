@@ -1,8 +1,13 @@
 # contracts.demo
 
-Contracts for Fluidex demo
+Contracts for Fluidex demo, using hardhat local node for now.
 
 ```
 yarn install
-npx hardhat test
+
+// in one terminal
+npx hardhat node
+
+// in another terminal
+npx hardhat run scripts/deploy.js --network localhost
 ```
