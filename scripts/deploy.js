@@ -14,10 +14,12 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const fluidexFactory = await ethers.getContractFactory("Fluidex");
-  fluidex = await fluidexFactory.deploy();
+  const fluidexFactory = await ethers.getContractFactory("FluidexDemo");
+  let genesisRoot = process.env.GENESIS_ROOT;
+  console.log("genesisRoot:", genesisRoot);
+  fluidex = await fluidexFactory.deploy(genesisRoot);
   await fluidex.deployed();
-  await fluidex.initialize();
+  // await fluidex.initialize();
   console.log("Fluidex deployed to:", fluidex.address);
 }
 
