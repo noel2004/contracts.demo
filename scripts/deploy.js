@@ -4,6 +4,7 @@
 // When running the script with `hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
+const shell = require('shelljs');
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -21,6 +22,10 @@ async function main() {
   await fluidex.deployed();
   // await fluidex.initialize();
   console.log("Fluidex deployed to:", fluidex.address);
+  let aaa="export FLUIDEX_CONTRACT_ADDRESS="+fluidex.address;
+  console.log(aaa);
+  await shell.exec(aaa);
+  console.log("FLUIDEX_CONTRACT_ADDRESS:", process.env.FLUIDEX_CONTRACT_ADDRESS);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
