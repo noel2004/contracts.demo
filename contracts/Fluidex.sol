@@ -18,7 +18,7 @@ contract FluidexDemo is Events, KeyedVerifier, ReentrancyGuard {
 
    enum BlockState {
       Empty,
-      Submitted,
+      Committed,
       Verified
    }
 
@@ -145,7 +145,7 @@ contract FluidexDemo is Events, KeyedVerifier, ReentrancyGuard {
          assert(block_states[_block_id] != BlockState.Verified);
          block_states[_block_id] = BlockState.Verified;
       } else {
-         // mark a block as Submitted (Committed) directly, because we may
+         // mark a block as Committed directly, because we may
          // temporarily run out of proving resource.
          // note: Committing a block without a rollback/revert mechanism should
          // only happen in demo version!
@@ -153,7 +153,7 @@ contract FluidexDemo is Events, KeyedVerifier, ReentrancyGuard {
             assert(block_states[_block_id-1] != BlockState.Empty);
          }
          assert(block_states[_block_id] == BlockState.Empty);
-         block_states[_block_id] = BlockState.Submitted;
+         block_states[_block_id] = BlockState.Committed;
       }
       state_roots[_block_id] = _public_inputs[1];
 
