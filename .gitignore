@@ -8,3 +8,6 @@ artifacts
 contracts/verifier.sol
 
 *.log
+
+contract-deployed.env
+ganache/
