@@ -1,3 +1,6 @@
+const { infuraApiKey, walletPrivateKey, etherscanApiKey } = require('./secrets.json');
+
+require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -26,6 +29,13 @@ module.exports = {
         interval: [3000, 6000]
       }
     },
+    goerli: {
+      url: `https://goerli.infura.io/v3/${infuraApiKey}`,
+      accounts: [walletPrivateKey],
+    }
+  },
+  etherscan: {
+    apiKey: etherscanApiKey
   },
   solidity: "0.8.4",
 };
