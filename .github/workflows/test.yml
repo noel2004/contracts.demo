@@ -54,7 +54,7 @@ jobs:
         env:
           SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
         run: |
-          cat "$SECRETS_JSON" > secrets.json
+          echo "$SECRETS_JSON" > secrets.json
 
       - name: Verify via smart contract
         run: |
