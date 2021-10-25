@@ -52,7 +52,7 @@ jobs:
 
       - name: create secrets
         env:
-          SECRETS_JSON: {{ secrets.SECRETS_JSON }}
+          SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
         run: |
           cat "$SECRETS_JSON" > secrets.json
 
