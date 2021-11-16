@@ -1,15 +1,29 @@
+import * as fs from 'fs';
 import { Account } from "fluidex.js";
 import { run, ethers } from "hardhat";
 import * as hre from "hardhat";
-import { default as tokens} from "../tokens";
 import { getTestAccount } from "./accounts";
 
 const loadAccounts = () => Array.from(botsIds).map((user_id) => Account.fromMnemonic(getTestAccount(user_id).mnemonic));
 const botsIds = [1, 2, 3, 4, 5];
 const accounts = loadAccounts();
 
+interface Token {
+  symbol: string,
+  address: string,
+}
+
 async function main() {
   await run('compile');
+
+  let tokens: Token[];
+  if (hre.network.name == "geth") {
+    const raw = fs.readFileSync('/tmp/tokens.json', 'utf-8');
+    tokens = JSON.parse(raw);
+  } else {
+    const raw = fs.readFileSync('../tokens.json', 'utf-8');
+    tokens = JSON.parse(raw);
+  }
 
   const verifierFactory = await ethers.getContractFactory("KeyedVerifier");
   const verifier = await verifierFactory.deploy();
@@ -39,13 +53,13 @@ async function main() {
   console.log("grant DELEGATE_ROLE to FluiDexDelegate");
 
   const addToken = fluiDexDelegate.functions.addToken;
-  for (const {name, address} of Array.from(tokens)) {
+  for (const {symbol, address} of Array.from(tokens)) {
     await addToken(address);
-    console.log(`add ${name} token at`, address);
+    console.log(`add ${symbol} token at`, address);
   }
 
   // skip verify on localhost
-  if (hre.network.name !== "localhost") {
+  if (hre.network.name !== "geth") {
     await run('verify', {
       address: verifier.address,
       contract: "contracts/Verifier.sol:KeyedVerifier",
