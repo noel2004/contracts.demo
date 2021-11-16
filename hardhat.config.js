@@ -17,8 +17,13 @@ task("accounts", "Prints the list of accounts", async () => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  defaultNetwork: "hardhat",
+  defaultNetwork: "geth",
   networks: {
+    geth: {
+      url: "http://localhost:8545",
+      gas: 3000000,
+      gasPrice: 10,
+    },
     hardhat: {
       chainId: 1337,
       mining: {
