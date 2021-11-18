@@ -15,6 +15,7 @@ const config: HardhatUserConfig = {
     goerli: {
       url: `https://goerli.infura.io/v3/${infuraApiKey}`,
       accounts: [walletPrivateKey],
+      gas: 30000000,
     }
   },
   etherscan: {

@@ -17,13 +17,8 @@ async function main() {
   await run('compile');
 
   let tokens: Token[];
-  if (hre.network.name == "geth") {
-    const raw = fs.readFileSync('/tmp/tokens.json', 'utf-8');
-    tokens = JSON.parse(raw);
-  } else {
-    const raw = fs.readFileSync('../tokens.json', 'utf-8');
-    tokens = JSON.parse(raw);
-  }
+  const raw = fs.readFileSync('/tmp/tokens.json', 'utf-8');
+  tokens = JSON.parse(raw);
 
   const verifierFactory = await ethers.getContractFactory("KeyedVerifier");
   const verifier = await verifierFactory.deploy();
@@ -60,20 +55,24 @@ async function main() {
 
   // skip verify on localhost
   if (hre.network.name !== "geth") {
-    await run('verify', {
-      address: verifier.address,
-      contract: "contracts/Verifier.sol:KeyedVerifier",
-    });
-    await run('verify', {
-      address: fluiDex.address,
-      contract: "contracts/FluiDex.sol:FluiDexDemo",
-      constructorArgsParams: [genesisRoot, verifier.address],
-    });
-    await run('verify', {
-      address: fluiDexDelegate.address,
-      contract: "contracts/FluiDexDelegate.sol:FluiDexDelegate",
-      constructorArgsParams: [fluiDex.address],
-    });
+    try {
+      await run('verify', {
+        address: verifier.address,
+        contract: "contracts/Verifier.sol:KeyedVerifier",
+      });
+      await run('verify', {
+        address: fluiDex.address,
+        contract: "contracts/FluiDex.sol:FluiDexDemo",
+        constructorArgsParams: [genesisRoot, verifier.address],
+      });
+      await run('verify', {
+        address: fluiDexDelegate.address,
+        contract: "contracts/FluiDexDelegate.sol:FluiDexDelegate",
+        constructorArgsParams: [fluiDex.address],
+      });
+    } catch (e) {
+      console.log("verify might fail:", e);
+    }
   }
 }
 
