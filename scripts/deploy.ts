@@ -18,7 +18,7 @@ async function main() {
   console.log("FluiDex deployed to:", fluiDex.address);
   const addToken = fluiDex.functions.addToken;
   for (const {name, address} of Array.from(tokens)) {
-    await addToken(address);
+    await addToken('0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266', address);
     console.log(`add ${name} token at`, address);
   }
 
