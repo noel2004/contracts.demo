@@ -71,6 +71,7 @@ contract FluiDexDemo is
         _setRoleAdmin(DELEGATE_ROLE, DEFAULT_ADMIN_ROLE);
         grantRole(TOKEN_ADMIN_ROLE, msg.sender);
         grantRole(PLUGIN_ADMIN_ROLE, msg.sender);
+        grantRole(DELEGATE_ROLE, msg.sender);
     }
 
     /**
@@ -147,7 +148,7 @@ contract FluiDexDemo is
      * @param ethAddr the L1 address
      * @param bjjPubkey the L2 address (bjjPubkey)
      */
-    function registerUser(address ethAddr, bytes32 bjjPubkey) internal {
+    function registerUser(address ethAddr, bytes32 bjjPubkey) public {
         require(userBjjPubkeyToUserId[bjjPubkey] == 0, "user existed");
         userNum++;
         require(userNum < USER_NUM_LIMIT, "user num limit reached");
