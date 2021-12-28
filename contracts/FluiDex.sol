@@ -79,9 +79,10 @@ contract FluiDexDemo is
     /**
      * @notice request to add a new ERC20 token
      * @param tokenAddr the ERC20 token address
+     * @param prec specify the precise inside fluidex
      * @return the new ERC20 token tokenId
      */
-    function addToken(address tokenAddr)
+    function addToken(address tokenAddr, uint8 prec)
         external
         override
         nonReentrant
@@ -94,12 +95,11 @@ contract FluiDexDemo is
 
         uint16 tokenId = tokenNum;
         tokenIdToAddr[tokenId] = tokenAddr;
-        tokenAddrToId[tokenAddr] = tokenId;
+        tokenAddrToId[tokenAddr] = prec;
 
         //TODO: should provide token's prec and check token's decimal
         tokenScales[tokenId] = 12;
 
-        emit NewToken(origin, tokenAddr, tokenId);
         return tokenId;
     }
 
@@ -111,10 +111,11 @@ contract FluiDexDemo is
         payable
         override
         onlyRole(DELEGATE_ROLE)
+        returns (uint128 realAmount)
     {
         uint16 accountId = userBjjPubkeyToUserId[to];
         require(accountId != 0, "non-existed user");
-        uint128 amount = Operations.scaleTokenValueToAmount(
+        realAmount = Operations.scaleTokenValueToAmount(
             msg.value,
             tokenScales[0]
         );
@@ -122,16 +123,13 @@ contract FluiDexDemo is
         Operations.Deposit memory op = Operations.Deposit({
             accountId: accountId,
             tokenId: 0,
-            amount: amount
+            amount: realAmount
         });
 
         addPriorityRequest(
             Operations.OpType.Deposit,
             Operations.writeDepositPubdataForPriorityQueue(op)
         );
-
-        //TODO: correct the value to scaled amount?
-        emit Deposit(ETH_ID, to, msg.value);
     }
 
     /**
@@ -143,34 +141,31 @@ contract FluiDexDemo is
         nonReentrant
         tokenExist(token)
         onlyRole(DELEGATE_ROLE)
-        returns (uint16 tokenId, uint256 realAmount)
+        returns (uint16 tokenId, uint128 realAmount)
     {
         tokenId = tokenAddrToId[address(token)];
 
         uint256 balanceBeforeDeposit = token.balanceOf(address(this));
         token.safeTransferFrom(msg.sender, address(this), amount);
         uint256 balanceAfterDeposit = token.balanceOf(address(this));
-        uint256 realAmount = balanceAfterDeposit - balanceBeforeDeposit;
 
         uint16 accountId = userBjjPubkeyToUserId[to];
         require(accountId != 0, "non-existed user");
-        uint128 scaledAmount = Operations.scaleTokenValueToAmount(
-            amount,
+        realAmount = Operations.scaleTokenValueToAmount(
+            balanceAfterDeposit - balanceBeforeDeposit,
             tokenScales[tokenId]
         );
 
         Operations.Deposit memory op = Operations.Deposit({
             accountId: accountId,
             tokenId: tokenId,
-            amount: scaledAmount
+            amount: realAmount
         });
 
         addPriorityRequest(
             Operations.OpType.Deposit,
             Operations.writeDepositPubdataForPriorityQueue(op)
         );
-
-        emit Deposit(tokenId, to, realAmount);
     }
 
     /**
@@ -204,8 +199,6 @@ contract FluiDexDemo is
             Operations.OpType.Registry,
             Operations.writeRegistryPubdataForPriorityQueue(op)
         );
-
-        emit RegisterUser(ethAddr, userId, bjjPubkey);
     }
 
     function getBlockStateByBlockId(uint256 _block_id)
